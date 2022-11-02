@@ -1,0 +1,61 @@
+---
+title: "Hw 1 Coding 1"
+author: "Victoria Mosby"
+date: '2022-10-04'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+## Clear the environment
+
+
+```{r}
+rm(list = ls())
+
+```
+
+## Creating a string variable which states that this is my first assignment in R, but that is not true. This is however my first assignment in R Markdown.
+
+```{r}
+str_var = 'This is my first assignment in RMarkdown!'
+
+```
+
+#Checking to make sure that I have a string variable
+``` {r}
+typeof(str_var)
+```
+
+#Create a vector 'v', which contains: 3, 363, 777, 2021, -987 and Inf
+```{r}
+v = c(3, 363, 777, 2021, -987, Inf)
+
+```
+
+#Not part of the assignment but let's check to see what this is
+```{r}
+typeof(v)
+```
+#Now let's multiply this vector with 10 
+```{r}
+v_10 = v*10 
+```
+#Create a list, which contains str_var and v
+```{r}
+mL = list(str_var, v)
+```
+#Get the value of 'Inf' out of this 'mL' variable with indexing 
+```{r}
+typeof(mL[[2]][6])
+```
+#Decide whether the former extracted value is infinite or not. If false it is infinite
+```{r}
+
+is.finite(mL[[2]][6])
+Inf == mL[[2]][6]
+```
+
