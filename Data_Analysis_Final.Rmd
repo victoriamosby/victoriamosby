@@ -1,0 +1,208 @@
+---
+title: "Data Analysis with R"
+author: "Victoria Mosby"
+date: "2022-12-20"
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+	message = FALSE,
+	warning = FALSE,
+	results = T)
+
+#Load libraries
+library(tidyverse)
+library(modelsummary)
+library(dplyr)
+library(kableExtra)
+library(prettydoc)
+```
+
+```{r}
+#Download data
+
+df <- read.csv('C:/Users/Lg/OneDrive/Documents/cardio_fitness.csv')
+
+```
+
+
+```{r}
+#Check variables and convert character variables into binary or numeric
+#Checked these in the console
+#typeof(df$Gender)
+#typeof(df$MaritalStatus)
+#typeof(df$Age)
+#typeof(df$Education)
+#typeof(df$Usage)
+#typeof(df$Fitness)
+#typeof(df$Income)
+#typeof(df$Miles)
+
+df = mutate(df, Gender = factor(Gender))
+df$Gender = as.numeric(df$Gender)
+#typeof(df$Gender)
+#1 is female and 2 is male
+
+df = mutate(df, MaritalStatus = factor(MaritalStatus))
+df$MaritalStatus = as.numeric(df$MaritalStatus)
+#typeof(df$MaritalStatus)
+#1 is partnered and 2 is single
+
+P95 <- function(x){ quantile(x,.95,na.rm=T)}
+P5 <- function(x){quantile(x, .05, na.rm=T)}
+
+datasummary(Age + Gender + Education + MaritalStatus + Usage + Fitness + Income + Miles ~ 
+              Mean + SD + Min + Max + Median +P5 + P95 + N, data = df)
+
+```
+
+## Inpretation of the dataset
+
+The average age of the users is 28 to 29 years of age (28.79) with the youngest being 18 years of age and the oldest being no more than 50 years of age. The median age however is 26 years old signifying a slightly right skewed distribution (mean is greater than median).
+
+As the gender is 1.58 there are slightly more observations of men (2) than women (1). 
+
+Education is denoted in number of years. Someone with 12 years of education has completed high school, 16 years is someone with enough years to have completed a bachelors and 18 years is someone who has enough to have completed a masters degree. In this, the average user has 15.57 years of education. The minimum number in this dataset is 12 and the maximum is 21 years. The median number of years however is 16. This would indicate that the distribution is just slightly left skewed. 
+
+As the number for Marital Status is 1.41 with partnered being 1 and single being 2, there are slightly more users that are partnered than single. 
+
+Usage signifies the number of times the user plans to use the treadmill a week with a minimum of 2 and a maximum of 7. The average person said 3.46 or three/four times a week. 
+
+On a scale of 1 to 5, users rated themselves as not being very fit (1) to being in excellent condition (5). The average user believed themselves to be just above average at 3.31. 
+
+As for income; the minimim income a user reported was 29,562USD annually, and the maximum is 104,581USD annually. The average would be $53,719.58 while the median was $50,596.50. A slightly higher number of people had lower than 53,719.58USD making the distribution slightly right skewed. 
+
+Miles: according to this the average number of miles a user expected to run/walk a week was 103.19 miles. The minimum number of miles a week a user expected to complete was 21 with a maximum of 360. These people are incredibly optimistic. 
+
+Finally, the number of observations in the dataset are 180. 
+
+
+```{r}
+#Let's take a look at product TM195
+TM195 <- df %>% 
+  filter(Product == 'TM195')
+
+#View new variable 
+View(TM195)
+
+datasummary(Age + Gender + Education + MaritalStatus + Usage + Fitness + Income + Miles ~ 
+              Mean + SD + Min + Max + Median +P5 + P95 + N, data = TM195)
+```
+## Interpretation for Product TM195
+
+In this dataset there are 80 observations. 
+
+The typical user for a Product TM195 is approximately 28 to 29 years old with an equal chance of being male or female. They have approximately 15 years of education, more than a high school graduation but less than a bachelors degree. They are slightly more likely to be partnered than to be single and expect to use the treadmill about 3 times a week. They would rate themselves as being slightly less fit than average and would like to run on average 82.79 miles a week. The average income of a user for this product is $46,418.03 per year; less than what the income of the overall dataset is. 
+
+
+```{r}
+#Let's take a look at product TM498
+TM498 <- df %>% 
+  filter(Product == 'TM498')
+
+#View new variable 
+View(TM498)
+
+datasummary(Age + Gender + Education + MaritalStatus + Usage + Fitness + Income + Miles ~ 
+              Mean + SD + Min + Max + Median +P5 + P95 + N, data = TM498)
+```
+## Interpretation for product TM498
+
+In this dataset there are 60 observations. 
+
+The typical user for a Product TM498 is approximately 29 years old with a slightly higher chance of being male. They have approximately 15 years of education, more than a high school graduation but less than a bachelors degree. They are slightly more likely to be partnered than to be single and expect to use the treadmill about 3 times a week. They would rate themselves as being slightly less fit than average and less fit than the TM195 users and would like to run on average 87.93 miles a week. The minimum number of miles that a TM498 is 21 which is less than the minimum number of a TM195 at 38 miles per week. The average income of a user for this product is $48973.65 per year; less than what the income of the overall dataset is but greater than a TM195 user. The standard deviation for the income of this user is $8653.99 which is slightly less than the TM195 at $9075.78 meaning that the TM498 user income range has less variation than the TM195 users. 
+
+
+```{r}
+#Let's take a look at product TM798
+TM798 <- df %>% 
+  filter(Product == 'TM798')
+
+#View new variable 
+View(TM798)
+
+datasummary(Age + Gender + Education + MaritalStatus + Usage + Fitness + Income + Miles ~ 
+              Mean + SD + Min + Max + Median +P5 + P95 + N, data = TM798)
+```
+## Interpretation for product TM798
+
+In this dataset there are 40 observations. 
+
+The typical user for a Product TM798 is approximately 29 years old with a much higher chance of being male. They have approximately 17 years of education, more than a high school graduation and more than a bachelors degree. They are slightly more likely to be partnered than to be single and expect to use the treadmill about 4 to 5 times a week. They would rate themselves as being fairly fit (4) to being in excellent condition (5) much more than the TM195 and TM498 users and would like to run on average 166.90 miles a week. The minimum number of miles that a TM798 would like to run/walk is 60 which is more than the minimum number of a TM195 at 38 miles per week and more than the TM498 at 21 miles. The average income of a user for this product is $75,444.57 per year; more than what the income of the overall dataset is and greater than a TM195 and TM498 user. The standard deviation for the income of this user is $18,505 which is greater than the TM195 at $9075.78 and TM498 at $8653.99 meaning that the TM798 user income range has more variation than the TM195 and TM498 users. As the median is $76,568.50 the distribution is slightly left skewed. 
+
+
+# Data Visualization
+
+
+```{r}
+library(ggplot2)
+#Let's graph the data to get an idea of what the data can show. I selected two numeric variables to see the relationship between age the number of miles. 
+p1 <- ggplot(data = df, aes(x = Age, y = Miles)) +
+  geom_point(color = 'red', size = 2, shape = 16,) + 
+  geom_smooth(method = 'loess', formula = y ~ x) +
+  ggtitle("Dataset") +
+  labs(x = 'Age',y = 'Number of Miles')
+
+
+p2 <- ggplot(data = TM195, aes(x = Age, y = Miles)) +
+  geom_point(color = 'orange', size = 2, shape = 16,) + 
+  geom_smooth(method = 'loess', formula = y ~ x) +
+  ggtitle("TM195") +
+  labs(x = 'Age',y = 'Number of Miles')
+
+
+p3 <- ggplot(data = TM498, aes(x = Age, y = Miles)) +
+  geom_point(color = 'darkgreen', size = 2, shape = 16,) + 
+  geom_smooth(method = 'loess', formula = y ~ x) +
+  ggtitle("TM498") +
+  labs(x = 'Age',y = 'Number of Miles')
+
+
+p4 <- ggplot(data = TM798, aes(x = Age, y = Miles)) +
+  geom_point(color = 'blue', size = 2, shape = 16,) + 
+  geom_smooth(method = 'loess', formula = y ~ x) +
+  ggtitle("TM798") +
+  labs(x = 'Age',y = 'Number of Miles')
+
+
+#One method of combining the graphs is GGArrange, though I have used others in the past
+library(ggpubr)
+plots <- ggarrange(p1, p2, p3, p4,
+                              ncol = 2, nrow = 2)
+plots
+```
+
+## Regressions 
+
+While I do not think regressions are necessary for understanding this particular dataset, it would be interesting to see the relationship behind the variables Age and Miles. 
+
+
+```{r}
+#Regression with Age and Miles for the dataset and each product
+library(fixest)
+reg0 <- feols(Age ~ Miles, data = df, vcov = 'hetero')
+reg0
+
+reg1 <- feols(Age ~ Miles, data = TM195, vcov = 'hetero')
+reg1
+
+reg2 <- feols(Age ~ Miles, data = TM498, vcov = 'hetero')
+reg2
+
+reg3 <- feols(Age ~ Miles, data = TM798, vcov = 'hetero')
+reg3
+
+#The table from Gabors website 
+#Here is an alternative that I am keeping here but prefer the bottom form. 
+#etable(reg0, reg1, reg2, reg3)
+
+library(texreg)
+#Let's use another method from a classmate who posted on slack to combine the regressions
+screenreg(list(reg0,reg1,reg2,reg3), caption= "Regressions Results", caption.above=TRUE)
+```
+
+For a one year increase of age, the number of miles increase by 28.28 in the dataset, 29.89 for product TM195, 31.09 for product TM498, and 24.39 for product TM798. 
