@@ -1,0 +1,165 @@
+---
+title: "Webscrapping City Information"
+author: "Victoria"
+date: "16-3-2023"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+```{=html}
+<style>
+body {
+text-align: justify}
+</style>
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = T,
+	message = FALSE,
+	warning = FALSE,
+	results = T
+)
+```
+
+```{r library}
+
+library(pacman)
+
+p_load(jsonlite, httr, tidyverse,rvest, data.table, kableExtra, prettydoc)
+
+```
+
+```{r individual - practice not final code, eval=FALSE, include=FALSE}
+
+get_cities <- function(search) {
+  headers = c(
+    `Accept` = 'application/vnd.teleport.v1+json'
+  )
+  params = list(
+    `search` = search
+  )
+  res <- httr::GET(url = 'https://api.teleport.org/api/cities/', 
+                   httr::add_headers(.headers=headers), query = params)
+  
+  #Put into a variable the json information  
+  d <-fromJSON(content(res, 'text'))
+  
+  #Renamed the variable due to name beginning with an underscore
+  names(d) <- c('embedded', 'links', 'count')
+  names(d[[1]][[1]]) <- c('links1', 'empty_list')
+  return(d)
+}
+
+France_cities <- get_cities("France")
+Austria_cities <- get_cities("Austria")
+India_cities <- get_cities("India")
+
+geomid <- India_cities$embedded$`city:search-results`$links1$`city:item`$href
+
+headers = c(
+    `Accept` = 'application/vnd.teleport.v1+json'
+  )
+
+res_1 <- httr::GET(url = geomid[[1]], 
+                   httr::add_headers(.headers=headers))
+
+citi_info_1 <- fromJSON(content(res_1, 'text'))
+
+citi_1_name <- citi_info_1$full_name
+citi_1_lat <- citi_info_1$location$latlon$latitude
+citi_1_lon <- citi_info_1$location$latlon$longitude
+citi_1_pop <- citi_info_1$population
+
+citi_1 <- data.table(Name = c(citi_info_1$full_name),
+                     Latitude = c(citi_info_1$location$latlon$latitude),
+                     Longitude = c(citi_info_1$location$latlon$longitude),
+                     Population = c(citi_info_1$population)
+)
+
+res_2 <- httr::GET(url = geomid[[2]], 
+                   httr::add_headers(.headers=headers))
+
+citi_info_2 <- fromJSON(content(res_2, 'text'))
+#citi_2_name <- citi_info_1[[4]][[2]][[1]]
+
+citi_2_name <- citi_info_1$full_name
+citi_2_lat <- citi_info_1$location$latlon$latitude
+citi_2_lon <- citi_info_1$location$latlon$longitude
+citi_2_pop <- citi_info_1$population
+
+citi_2 <- data.table(Name = c(citi_info_2$full_name),
+                     Latitude = c(citi_info_2$location$latlon$latitude),
+                     Longitude = c(citi_info_2$location$latlon$longitude),
+                     Population = c(citi_info_2$population)
+)
+
+citi <- rbindlist(list(citi_1, citi_2))
+```
+
+
+```{r master code}
+
+city_info <- function(country) { ### input the name of the country
+  headers = c(
+    `Accept` = 'application/vnd.teleport.v1+json'
+  )
+  params = list(
+    `search` = country
+  )
+  res <- httr::GET(url = 'https://api.teleport.org/api/cities/', 
+                   httr::add_headers(.headers=headers), query = params)
+  
+  # Info on cities of the country  
+  citi <-fromJSON(content(res, 'text'))
+  
+  #Renamed the variable due to name beginning with an underscore
+  names(citi) <- c('embedded', 'links', 'count')
+  names(citi[[1]][[1]]) <- c('links1', 'empty_list')
+  
+  #Links to info of cities
+  geomid <- as.list(citi$embedded$`city:search-results`$links1$`city:item`$href)
+  
+  # Input id, get respo
+  citi_id <- function(id) {
+    res_citi <- httr::GET(url = id, 
+                   httr::add_headers(.headers=headers))
+    return(res_citi)
+  }
+  citi_res <- lapply(geomid, citi_id)
+  
+  # Input respo, get city info list
+  citi_infos <- function(res) {
+    citi_info <- fromJSON(content(res, 'text'))
+    return(citi_info)
+  }
+  citi_information <- lapply(citi_res, citi_infos)
+  
+  # Input city info list, get table 
+  tables <- function(info) {
+    citi_table <- data.table(Name = c(info[[2]]),
+                             Latitude = c(info[[4]][[2]][[1]]),
+                             Longitude = c(info[[4]][[2]][[2]]),
+                             Population = c(info[[6]])
+                             )
+    return(citi_table)
+  }
+  citi_tables <- lapply(citi_information, tables)
+  
+  # Bind tables
+  citi <- rbindlist(citi_tables)
+  return(citi)
+}
+
+#citi_info_France <- city_info("France")
+#citi_info_Austria <-city_info("Austria")
+citi_info_Spain <- city_info("Spain")
+nice_table <- kable(citi_info_Spain)
+
+```
+
+```{r results, results=TRUE}
+nice_table
+```
